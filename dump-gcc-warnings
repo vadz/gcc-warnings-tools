@@ -1,0 +1,234 @@
+#!/usr/bin/env raku
+
+use v6.d;
+
+grammar GccOpt {
+    token TOP {
+        ^
+        [<.ignored-line>* <section> \n]*
+        <.ignored-line>*
+        $
+    }
+
+    # Ignore comments and empty lines.
+    token ignored-line {
+        ^^ [';' \N*]? \n
+    }
+
+    token section {
+        <warning-section> || <.other-section>
+    }
+
+    token warning-section {
+        ^^ W <warning-name> \n
+        <warning-section-options> \n
+        <.any-line>+ # Ignore subsequent help lines.
+    }
+
+    token warning-section-options {
+        ^^ <warning-section-option>+ % ' '
+    }
+
+    token warning-section-option {
+        || <alias-option>
+        || <common-option>
+        || <cxx-option>
+        || <enabled-by-option>
+        || <lang-enabled-by-option>
+        || <init-option>
+        || <warning-option>
+        || <.other-option> # Must be the last one as it always matches.
+    }
+
+    # Note that we have to use not-paren, something like "\S+" doesn't work
+    # inside token when using "~" as it consumes the closing delimiter too.
+    token non-paren { <[\N] - [)]>+ }
+    token alias-option { Alias '(' ~ ')' (<.non-paren>) }
+    token common-option { Common }
+    token cxx-option { 'C++' }
+    token enabled-by-option { EnabledBy '(' ~ ')' (<.non-paren>) }
+    token init-option { Init '(' ~ ')' (<.non-paren>) }
+    token lang-enabled-by-option {
+        LangEnabledBy '(' ~ ')' [ <language>+ % ' ' [',' W<warning-name> [',' <.non-paren>*]?]? ]
+    }
+    token warning-option { Warning }
+    token other-option { \S+ }
+
+    token language { < C ObjC C++ ObjC++ LTO > }
+
+    token warning-name { <[ - a..z = ]>+ }
+
+    token other-section {
+        <.any-line>+
+    }
+
+    token any-line {
+        ^^ \N+ \n
+    }
+}
+
+class GccOptActions {
+    # FIXME-RAKU: There is probably a more idiomatic way of including only the
+    # warning sections in the made value, but as written now, we'd end up with
+    # Nils in the result if we just used $<section>.made in the TOP method, so
+    # use an intermediate array to avoid this.
+    has @!warnings;
+
+    method TOP($/) { make @!warnings; }
+
+    method warning-section($/) {
+        @!warnings.push: $<warning-name>.made => $<warning-section-options>.made
+    }
+
+    method warning-name($/) { make ~$/ }
+    method warning-section-options($/) {
+        my %options;
+        for $<warning-section-option> -> $option {
+            my $value = $option.made;
+            if $value {
+                %options.append: $value
+            }
+        }
+        make %options;
+    }
+
+    method warning-section-option($/) {
+        # FIXME-RAKU: Is it possible to just iterate over all the children instead?
+        for <
+                alias-option
+                common-option
+                cxx-option
+                enabled-by-option
+                init-option
+                lang-enabled-by-option
+                warning-option
+            > -> $option {
+            if $/{$option} {
+                make $/{$option}.made;
+                last
+            }
+        }
+    }
+
+    # FIXME-RAKU: Why are the extra parentheses needed here?
+    method alias-option($/) { make (:is-alias($0)) }
+    method common-option($/) { make (:is-common) }
+    method cxx-option($/) { make (:is-cxx) }
+    method enabled-by-option($/) { make (:enabled-by($0)) }
+    method lang-enabled-by-option($/) { make (:lang-enabled-by($<warning-name>.made)) }
+    method init-option($/) { make (:init($0)) }
+    method warning-option($/) { make (:is-warning) }
+}
+
+sub MAIN(*@opt-files, Bool :$debug, Bool :$all) {
+    # Process command-line arguments and read the input files.
+    sub log-debug($msg) {
+        note $msg if $debug;
+    }
+
+    my $input = @opt-files ?? ([~] .IO.slurp for @opt-files) !! $*IN.slurp;
+
+    my $results = GccOpt.parse($input, actions => GccOptActions.new)
+        or die qq{Failed to parse gcc options.};
+
+    # Collect all parsed information into a hash indexed by the warning name
+    # (without the leading "-W").
+    my %warnings;
+    for |$results.made -> $section {
+        my ($warning-name, $options) = $section.kv;
+
+        my $warning-info = %warnings{$warning-name};
+
+        # Test for this before checking is-warning, as some aliases for the
+        # warnings don't actually use "Warning" themselves.
+        if $options<is-alias> {
+            log-debug "Skipping -W$warning-name which is an alias for -$options<is-alias>.";
+            next
+        }
+
+        if !defined $warning-info {
+            # Sanity check. Note that we only do it for the first occurrence,
+            # subsequent ones don't repeat "Warning" any more.
+            if !$options<is-warning> {
+                given $warning-name {
+                    # There are a couple of -Wxxx flags that are not actually
+                    # warnings, don't complain about those.
+                    when 'error' | 'error=' | 'fatal-errors' {
+                        next
+                    }
+
+                    # In older versions of gcc (until gcc 6), these warnings
+                    # didn't have "Warning" in their flags, but they should
+                    # still be processed as warnings and it's useless to warn
+                    # about them.
+                    when 'float-conversion' |
+                         'frame-larger-than=' |
+                         'sign-conversion' |
+                         'unreachable-code'
+                         {
+                        # Do nothing.
+                    }
+
+                    # All the others should have "Warning" in their flags.
+                    default {
+                        note "Option -W$warning-name unexpectedly isn't a warning.";
+                        next
+                    }
+                }
+            }
+
+            # Ensure that the options are defined, even if empty, the next
+            # time we look them up.
+            $warning-info = {};
+        }
+
+        # Remember the options, merging them with those from the previous
+        # occurrence, if any. We'll need at least is-common and is-cxx for the
+        # check below when dumping.
+        $warning-info.push: $options.kv;
+
+        %warnings{$warning-name} = $warning-info;
+    }
+
+    log-debug "Collected information about { %warnings.elems } warnings.";
+
+    # Now dump this hash in the desired format.
+    my $warnings-dumped = 0;
+    for %warnings.sort -> (:key($warning-name), :value($options)) {
+        # Skip the options not relevant for C++. Note that we can't do this in
+        # the loop above because we could then eliminate some common options
+        # that don't use "Common" (for whatever reason) before we encounter
+        # the second occurrency of the same option specific to C++.
+        if !$options<is-common> && !$options<is-cxx> {
+            log-debug "Skipping -W$warning-name which doesn't apply to C++.";
+            next
+        }
+
+        my $enabled-by;
+
+        # Ignore the warnings which are trivially caused by themselves.
+        if $warning-name ~~ 'all' | 'extra' | 'pedantic' {
+            $enabled-by = $warning-name;
+        } elsif $enabled-by = $options<enabled-by> {
+            # Remove the leading "W" from the warning names for consistency
+            # with those appearing in LangEnabledBy.
+            $enabled-by ~~ s:g/<<W//;
+        } elsif ($options<init> // '0') eq '1' {
+            $enabled-by = 'default';
+        } else {
+            $enabled-by = $options<lang-enabled-by>;
+        }
+
+        if $all {
+            put "$warning-name,{$enabled-by // ''}"
+        } else {
+            next if $enabled-by;
+
+            put $warning-name;
+        }
+
+        $warnings-dumped++;
+    }
+
+    log-debug "Dumped information about $warnings-dumped C++ warnings.";
+}

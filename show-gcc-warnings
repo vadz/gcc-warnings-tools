@@ -1,0 +1,141 @@
+#!/usr/bin/env raku
+
+use v6.d;
+
+sub MAIN(
+        Str $gcc-directory,         #= Directory with gcc sources.
+        Str :$dump-all-to,          #= Dump per-version files to this directory.
+        Str :$read-from,            #= Read existing files instead of reparsing.
+        Str :$only-version,         #= Process only the (comma-separated) version(s).
+        Bool :$json,                #= Use JSON for output (default: CSV).
+        Bool :$cpp,                 #= Output C++ code fragment.
+    ) {
+    die qq{Please provide an existing gcc checkout path.} unless $gcc-directory.IO.d;
+
+    # All gcc releases since 3.4.5 have Git release tags of this form. Older
+    # releases are also tagged with gcc-x_y_z-release, but we don't care about
+    # anything older than 4.6 anyhow and there are no such tags for gcc 9 and
+    # later, so rely on having those ones.
+    constant $GCC_RELEASE_PREFIX = 'releases/gcc-';
+
+    # We only handle the versions that use options descriptions in these files.
+    constant @GCC_OPT_FILES = <gcc/common.opt gcc/c-family/c.opt>;
+
+    my @versions;
+    if $only-version {
+        @versions = split ',', $only-version;
+    } else {
+        # Get the list of all released versions since the commit which added
+        # c-family/c.opt file.
+        #
+        # Micro releases never add any new warnings (they contain only bug
+        # fixes), so we can restrict the list of versions we process to x.y.0
+        # releases only.
+        constant $SHA1_C_OPT_REFACTOR = '39dabefd0e5e21b7829ec4ddf811ab19346983d7';
+        my $proc = run qqww{git -C "$gcc-directory" tag --list "$GCC_RELEASE_PREFIX*.0"
+                            --contains $SHA1_C_OPT_REFACTOR}, :out;
+
+        my $all-releases = $proc.out.slurp(:close)
+            or die qq{Failed to run git in "$gcc-directory".};
+
+        @versions = $all-releases.lines.map({ S/$GCC_RELEASE_PREFIX// });
+    }
+
+    # Leave gcc repository in its original state at the end.
+    LEAVE {
+        run qqww{git -C "$gcc-directory" checkout HEAD -- @GCC_OPT_FILES[]};
+    }
+
+    my @GCC_OPT_PATHS = "$gcc-directory/" «~« @GCC_OPT_FILES;
+
+    # Sort the releases in version order, which is different from the default
+    # string sort order (we need to have 10.x > 4.y).
+    @versions.=sort({ Version.new: $_ });
+
+    if $dump-all-to {
+        die "Options --dump-all-to and --read-from are incompatible.\n" if $read-from;
+
+        # Create the directory if necessary, will do nothing if it exists.
+        $dump-all-to.IO.mkdir();
+
+        for @versions -> $version {
+            $*ERR.print("Dumping release $version... ");
+            LEAVE $*ERR.print("\n");
+
+            my $out-path = "$dump-all-to/$version";
+            if $out-path.IO.f {
+                $*ERR.print(qq{skipped, output file already exists.});
+                next
+            }
+
+            run qqww{git -C "$gcc-directory" checkout "$GCC_RELEASE_PREFIX$version" -- @GCC_OPT_FILES[]};
+
+            my $out-handle = open :w, $out-path;
+
+            run qqww{./dump-gcc-warnings @GCC_OPT_PATHS[]}, :out($out-handle);
+        }
+
+        return
+    }
+
+    my %warnings;
+    for @versions -> $version {
+        $*ERR.print("Processing release $version... ");
+        LEAVE $*ERR.print("\n");
+
+        my $in-handle;
+        if $read-from && "$read-from/$version".IO.f {
+            $in-handle = open :r, "$read-from/$version";
+
+            $*ERR.print('read existing file');
+        } else {
+            run qqww{git -C "$gcc-directory" checkout "$GCC_RELEASE_PREFIX$version" -- @GCC_OPT_FILES[]};
+
+            my $proc = run qqww{./dump-gcc-warnings @GCC_OPT_PATHS[]}, :out;
+            $in-handle = $proc.out;
+
+            $*ERR.print('parsed');
+        }
+
+        for $in-handle.lines -> $name {
+            %warnings{$name} //= $version;
+        }
+    }
+
+    if $json {
+        # Dump results as JSON.
+        use JSON::Fast;
+        put to-json %warnings
+    } elsif $cpp {
+        # Dump results as C++ fragment.
+        for %warnings.sort -> (:$key, :$value) {
+            # We can't use trailing '=', as such warnings must be specified with
+            # a value after '=', which we don't have here.
+            next if $key ~~ / '=' $/;
+
+            # Drop last .0 which is not really important.
+            (my $version = $value) ~~ s/ '.0' $//;
+
+            # Skip checks for 4.6: first of all, this is the first version we
+            # process, so it doesn't mean that the warning has really appeared
+            # in it, just was already present there. Second, this is the first
+            # version with _Pragma support, which is required to implement
+            # HANDLE_GCC_WARNING.
+            if $version eq '4.6' {
+                put "HANDLE_GCC_WARNING($key)"
+            } else {
+                print qq:to/END/;
+                    #if CHECK_GCC_VERSION({ S/\./,/ with $version })
+                    HANDLE_GCC_WARNING($key)
+                    #endif // $version
+                    END
+            }
+        }
+    } else {
+        # By default dump results as CSV.
+        put 'Warning,Version';
+        for %warnings.sort -> (:$key, :$value) {
+            put "$key,$value"
+        }
+    }
+}
