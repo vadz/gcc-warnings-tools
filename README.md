@@ -52,3 +52,8 @@ The helper `dump-gcc-warnings` script can be used to produce more detailed
 output, including the warnings enabled by default, if `--all` option is
 specified, for a particular gcc version, by passing it `common.opt` and
 `c-family/c.opt` files from gcc source tree as command line parameters.
+
+Note that, for convenience, output of the scripts for all gcc versions up to
+the latest tested one (currently 10.2) are provided directly in this
+repository, see `warnings.{cpp,csv,json}` files and `gcc` and `gcc-all`
+directories, containing per-directory warnings lists.
