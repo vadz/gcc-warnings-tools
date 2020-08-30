@@ -28,7 +28,9 @@ Run `./show-gcc-warnings $GCC_DIR > warnings.csv` to generate the CSV file
 containing all warnings not enabled by default or by one of the common warning
 options and the minimum version in which they appeared (note that 4.6.0 means
 that the warning was already present in gcc 4.6.0, not necessarily that it was
-introduced in this version).
+introduced in this version). With `--all` option, all warnings are included and
+the extra "Enabled by" column is added to show the condition enabling the
+warning.
 
 If [JSON::Fast](https://modules.raku.org/dist/JSON::Fast:cpan:TIMOTIMO) Raku
 module is available, specify `--json` option to obtain output in JSON format.

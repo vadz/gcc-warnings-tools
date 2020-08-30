@@ -7,6 +7,7 @@ sub MAIN(
         Str :$dump-all-to,          #= Dump per-version files to this directory.
         Str :$read-from,            #= Read existing files instead of reparsing.
         Str :$only-version,         #= Process only the (comma-separated) version(s).
+        Bool :$all,                 #= Show all warnings, not just not enabled by others.
         Bool :$json,                #= Use JSON for output (default: CSV).
         Bool :$cpp,                 #= Output C++ code fragment.
     ) {
@@ -48,6 +49,8 @@ sub MAIN(
 
     my @GCC_OPT_PATHS = "$gcc-directory/" «~« @GCC_OPT_FILES;
 
+    my $all-opt = $all ?? '--all' !! '';
+
     # Sort the releases in version order, which is different from the default
     # string sort order (we need to have 10.x > 4.y).
     @versions.=sort({ Version.new: $_ });
@@ -72,13 +75,13 @@ sub MAIN(
 
             my $out-handle = open :w, $out-path;
 
-            run qqww{./dump-gcc-warnings @GCC_OPT_PATHS[]}, :out($out-handle);
+            run qqww{./dump-gcc-warnings $all-opt @GCC_OPT_PATHS[]}, :out($out-handle);
         }
 
         return
     }
 
-    my %warnings;
+    my (%warnings, %enabled-by);
     for @versions -> $version {
         $*ERR.print("Processing release $version... ");
         LEAVE $*ERR.print("\n");
@@ -91,14 +94,17 @@ sub MAIN(
         } else {
             run qqww{git -C "$gcc-directory" checkout "$GCC_RELEASE_PREFIX$version" -- @GCC_OPT_FILES[]};
 
-            my $proc = run qqww{./dump-gcc-warnings @GCC_OPT_PATHS[]}, :out;
+            my $proc = run qqww{./dump-gcc-warnings $all-opt @GCC_OPT_PATHS[]}, :out;
             $in-handle = $proc.out;
 
             $*ERR.print('parsed');
         }
 
-        for $in-handle.lines -> $name {
+        for $in-handle.lines -> $line {
+            my ($name, $enabled-by) = $all ??  split(',', $line) !! ($line, Nil);
+
             %warnings{$name} //= $version;
+            %enabled-by{$name} = $enabled-by if $enabled-by;
         }
     }
 
@@ -133,9 +139,13 @@ sub MAIN(
         }
     } else {
         # By default dump results as CSV.
-        put 'Warning,Version';
+        put 'Warning,Version' ~ ($all ?? ',Enabled by' !! '');
         for %warnings.sort -> (:$key, :$value) {
-            put "$key,$value"
+            my $line = "$key,$value";
+            if $all and my $enabled-by = %enabled-by{$key} {
+                $line ~= ",$enabled-by"
+            }
+            put $line
         }
     }
 }
