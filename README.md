@@ -10,6 +10,13 @@ enabled by default, nor by using some other warning option, such as `-Wall`,
 to explicitly enable in the C++ projects already using all the usual "maximum"
 warning options.
 
+You can see the results of running the script for gcc versions up to 10
+online:
+
+1. Here are the [warnings not enabled](https://hackmd.io/@VZ/gcc-warnings) by
+   another warning option.
+1. And here is the table with [all gcc warnings](https://hackmd.io/@VZ/all-gcc-warnings).
+
 
 Requirements
 ------------
@@ -38,6 +45,9 @@ module is available, specify `--json` option to obtain output in JSON format.
 Alternatively, use `--cpp` option to generate C++ fragment, which can be
 included in the source of a program that needs to do something (e.g. turn on)
 all the warnings.
+
+Finally, `--markdown` option can be used to generate a Markdown table with the
+options.
 
 If `--dump-all-to` option is given, output files named `x.y.z` for all gcc
 releases since 4.6.0 containing all (not enabled by default) warnings

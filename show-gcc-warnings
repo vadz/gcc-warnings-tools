@@ -10,6 +10,7 @@ sub MAIN(
         Bool :$all,                 #= Show all warnings, not just not enabled by others.
         Bool :$json,                #= Use JSON for output (default: CSV).
         Bool :$cpp,                 #= Output C++ code fragment.
+        Bool :$markdown,            #= Output Markdown table.
     ) {
     die qq{Please provide an existing gcc checkout path.} unless $gcc-directory.IO.d;
 
@@ -136,6 +137,22 @@ sub MAIN(
                     #endif // $version
                     END
             }
+        }
+    } elsif $markdown {
+        # Dump results as a Markdown table.
+        print qq:to/END/;
+            | Warning | Version |{$all ?? ' Enabled by |' !! ''}
+            |---------|:-------:|{$all ?? ':----------:|' !! ''}
+            END
+        for %warnings.sort -> (:$key, :$value) {
+            # Drop last .0 which is not really important.
+            (my $version = $value) ~~ s/ '.0' $//;
+
+            my $line = "|`$key`|{$version eq '4.6' ?? '' !! $version}";
+            if $all and my $enabled-by = %enabled-by{$key} {
+                $line ~= "|$enabled-by"
+            }
+            put $line
         }
     } else {
         # By default dump results as CSV.
