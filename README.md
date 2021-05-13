@@ -10,7 +10,7 @@ enabled by default, nor by using some other warning option, such as `-Wall`,
 to explicitly enable in the C++ projects already using all the usual "maximum"
 warning options.
 
-You can see the results of running the script for gcc versions up to 10
+You can see the results of running the script for gcc versions up to 11.1
 online:
 
 1. Here are the [warnings not enabled](https://hackmd.io/@VZ/gcc-warnings) by
@@ -64,6 +64,6 @@ specified, for a particular gcc version, by passing it `common.opt` and
 `c-family/c.opt` files from gcc source tree as command line parameters.
 
 Note that, for convenience, output of the scripts for all gcc versions up to
-the latest tested one (currently 10.2) are provided directly in this
+the latest tested one (currently 11.1) are provided directly in this
 repository, see `warnings.{cpp,csv,json}` files and `gcc` and `gcc-all`
 directories, containing per-directory warnings lists.

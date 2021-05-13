@@ -36,6 +36,9 @@ HANDLE_GCC_WARNING(comment)
 HANDLE_GCC_WARNING(conditionally-supported)
 #endif // 4.9
 HANDLE_GCC_WARNING(conversion)
+#if CHECK_GCC_VERSION(11,1)
+HANDLE_GCC_WARNING(ctad-maybe-unsupported)
+#endif // 11.1
 HANDLE_GCC_WARNING(ctor-dtor-privacy)
 #if CHECK_GCC_VERSION(4,9)
 HANDLE_GCC_WARNING(date-time)
@@ -49,6 +52,12 @@ HANDLE_GCC_WARNING(deprecated-copy)
 #if CHECK_GCC_VERSION(9,1)
 HANDLE_GCC_WARNING(deprecated-copy-dtor)
 #endif // 9.1
+#if CHECK_GCC_VERSION(11,1)
+HANDLE_GCC_WARNING(deprecated-enum-enum-conversion)
+#endif // 11.1
+#if CHECK_GCC_VERSION(11,1)
+HANDLE_GCC_WARNING(deprecated-enum-float-conversion)
+#endif // 11.1
 HANDLE_GCC_WARNING(disabled-optimization)
 HANDLE_GCC_WARNING(double-promotion)
 #if CHECK_GCC_VERSION(7,1)
@@ -75,9 +84,15 @@ HANDLE_GCC_WARNING(format-signedness)
 #if CHECK_GCC_VERSION(4,7)
 HANDLE_GCC_WARNING(format-zero-length)
 #endif // 4.7
+#if CHECK_GCC_VERSION(11,1)
+HANDLE_GCC_WARNING(hsa)
+#endif // 11.1
 HANDLE_GCC_WARNING(ignored-qualifiers)
 HANDLE_GCC_WARNING(init-self)
 HANDLE_GCC_WARNING(inline)
+#if CHECK_GCC_VERSION(11,1)
+HANDLE_GCC_WARNING(invalid-imported-macros)
+#endif // 11.1
 HANDLE_GCC_WARNING(invalid-pch)
 #if CHECK_GCC_VERSION(4,8)
 HANDLE_GCC_WARNING(literal-suffix)

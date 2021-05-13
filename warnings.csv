@@ -41,6 +41,7 @@ conversion,4.6.0
 conversion-null,4.6.0,default
 coverage-mismatch,4.6.0,default
 cpp,4.6.0,default
+ctad-maybe-unsupported,11.1.0
 ctor-dtor-privacy,4.6.0
 dangling-else,7.1.0,parentheses
 date-time,4.9.0
@@ -50,6 +51,8 @@ deprecated,4.6.0,default
 deprecated-copy,9.1.0
 deprecated-copy-dtor,9.1.0
 deprecated-declarations,4.6.0,default
+deprecated-enum-enum-conversion,11.1.0
+deprecated-enum-float-conversion,11.1.0
 disabled-optimization,4.6.0
 div-by-zero,4.6.0,default
 double-promotion,4.6.0
@@ -89,6 +92,7 @@ init-self,4.6.0,all
 inline,4.6.0
 int-in-bool-context,7.1.0,all
 int-to-pointer-cast,4.6.0,default
+invalid-imported-macros,11.1.0
 invalid-memory-model,4.7.0,default
 invalid-offsetof,4.6.0,default
 invalid-pch,4.6.0
