@@ -169,6 +169,13 @@ sub MAIN(*@opt-files, Bool :$debug, Bool :$all) {
                         # Do nothing.
                     }
 
+                    # These were added in gcc 11 without warning flag for some
+                    # reason, but are still bona fide warnings too.
+                    when 'exceptions' |
+                         'invalid-imported-macros' {
+                        # So do nothing for them as well.
+                    }
+
                     # All the others should have "Warning" in their flags.
                     default {
                         note "Option -W$warning-name unexpectedly isn't a warning.";
