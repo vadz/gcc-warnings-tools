@@ -15,6 +15,7 @@ alloca-larger-than=,7.1.0
 arith-conversion,10.1.0
 array-bounds,4.6.0,all
 array-bounds=,5.1.0,all
+array-parameter=,11.1.0,all
 attribute-alias,8.1.0,default
 attribute-alias=,9.1.0,default
 attribute-warning,9.1.0,default
@@ -61,6 +62,8 @@ duplicated-cond,6.1.0
 empty-body,4.6.0,extra
 endif-labels,4.6.0,default
 enum-compare,4.6.0,all
+enum-conversion,11.1.0,extra
+exceptions,11.1.0,default
 expansion-to-defined,7.1.0,extra || pedantic
 extra,4.6.0,extra
 extra-semi,8.1.0
@@ -107,6 +110,8 @@ maybe-uninitialized,4.7.0,uninitialized
 memset-elt-size,7.1.0,all
 memset-transposed-args,5.1.0,all
 misleading-indentation,6.1.0,all
+mismatched-dealloc,11.1.0,all
+mismatched-new-delete,11.1.0,all
 mismatched-tags,10.1.0
 missing-attributes,8.1.0,all
 missing-braces,4.6.0,all
@@ -149,6 +154,7 @@ pointer-arith,4.6.0,pedantic
 pointer-compare,7.1.0,default
 pragmas,4.6.0,default
 prio-ctor-dtor,9.1.0,default
+range-loop-construct,11.1.0,all
 redundant-decls,4.6.0
 redundant-move,9.1.0,extra
 redundant-tags,10.1.0
@@ -171,6 +177,7 @@ sign-conversion,4.6.0,conversion
 sign-promo,4.6.0
 sized-deallocation,5.1.0,extra
 sizeof-array-argument,5.1.0,default
+sizeof-array-div,11.1.0,all
 sizeof-pointer-div,8.1.0,all
 sizeof-pointer-memaccess,5.1.0,all
 stack-protector,4.6.0
@@ -182,6 +189,7 @@ strict-overflow,4.6.0
 strict-overflow=,4.6.0,all
 string-compare,10.1.0
 stringop-overflow=,7.1.0
+stringop-overread,11.1.0,default
 stringop-truncation,8.1.0
 subobject-linkage,6.1.0,default
 suggest-attribute=cold,8.1.0
@@ -207,6 +215,7 @@ templates,6.1.0
 terminate,6.1.0,default
 trampolines,4.6.0
 trigraphs,4.6.0,all
+tsan,11.1.0,default
 type-limits,4.6.0,extra
 undef,4.6.0
 uninitialized,4.6.0,extra
@@ -229,10 +238,12 @@ useless-cast,4.8.0
 varargs,4.8.0,default
 variadic-macros,4.6.0,default
 vector-operation-performance,4.7.0
+vexing-parse,11.1.0,default
 virtual-inheritance,6.1.0
 virtual-move-assign,4.8.0,default
 vla,4.6.0
 vla-larger-than=,7.1.0
+vla-parameter,11.1.0,all
 volatile,10.1.0
 volatile-register-var,4.6.0,all
 write-strings,4.6.0
