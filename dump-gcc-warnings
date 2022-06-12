@@ -176,6 +176,11 @@ sub MAIN(*@opt-files, Bool :$debug, Bool :$all) {
                         # So do nothing for them as well.
                     }
 
+                    # This one is new in gcc 12 (not to be confused with
+                    # -Wattributes without the equal sign which is a warning).
+                    when 'attributes=' {
+                    }
+
                     # All the others should have "Warning" in their flags.
                     default {
                         note "Option -W$warning-name unexpectedly isn't a warning.";
