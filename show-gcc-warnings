@@ -112,7 +112,7 @@ sub MAIN(
     if $json {
         # Dump results as JSON.
         use JSON::Fast;
-        put to-json %warnings
+        put to-json %warnings, :sorted-keys
     } elsif $cpp {
         # Dump results as C++ fragment.
         for %warnings.sort -> (:$key, :$value) {
