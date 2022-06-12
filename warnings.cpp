@@ -14,6 +14,9 @@ HANDLE_GCC_WARNING(alloca)
 HANDLE_GCC_WARNING(arith-conversion)
 #endif // 10.1
 HANDLE_GCC_WARNING(array-bounds)
+#if CHECK_GCC_VERSION(12,1)
+HANDLE_GCC_WARNING(array-compare)
+#endif // 12.1
 HANDLE_GCC_WARNING(builtin-macro-redefined)
 HANDLE_GCC_WARNING(cast-align)
 #if CHECK_GCC_VERSION(8,1)
@@ -88,6 +91,9 @@ HANDLE_GCC_WARNING(format-zero-length)
 HANDLE_GCC_WARNING(hsa)
 #endif // 11.1
 HANDLE_GCC_WARNING(ignored-qualifiers)
+#if CHECK_GCC_VERSION(12,1)
+HANDLE_GCC_WARNING(infinite-recursion)
+#endif // 12.1
 HANDLE_GCC_WARNING(init-self)
 HANDLE_GCC_WARNING(inline)
 #if CHECK_GCC_VERSION(11,1)
@@ -136,6 +142,9 @@ HANDLE_GCC_WARNING(nonnull)
 HANDLE_GCC_WARNING(null-dereference)
 #endif // 6.1
 HANDLE_GCC_WARNING(old-style-cast)
+#if CHECK_GCC_VERSION(12,1)
+HANDLE_GCC_WARNING(openacc-parallelism)
+#endif // 12.1
 HANDLE_GCC_WARNING(overlength-strings)
 HANDLE_GCC_WARNING(overloaded-virtual)
 HANDLE_GCC_WARNING(packed)
@@ -207,6 +216,9 @@ HANDLE_GCC_WARNING(templates)
 #endif // 6.1
 HANDLE_GCC_WARNING(trampolines)
 HANDLE_GCC_WARNING(trigraphs)
+#if CHECK_GCC_VERSION(12,1)
+HANDLE_GCC_WARNING(trivial-auto-var-init)
+#endif // 12.1
 HANDLE_GCC_WARNING(type-limits)
 HANDLE_GCC_WARNING(undef)
 HANDLE_GCC_WARNING(uninitialized)
@@ -225,6 +237,9 @@ HANDLE_GCC_WARNING(unused-macros)
 HANDLE_GCC_WARNING(unused-parameter)
 HANDLE_GCC_WARNING(unused-value)
 HANDLE_GCC_WARNING(unused-variable)
+#if CHECK_GCC_VERSION(12,1)
+HANDLE_GCC_WARNING(use-after-free)
+#endif // 12.1
 #if CHECK_GCC_VERSION(4,8)
 HANDLE_GCC_WARNING(useless-cast)
 #endif // 4.8
