@@ -31,7 +31,7 @@ Requirements
 Operation
 ---------
 
-Run `./show-gcc-warnings $GCC_DIR > warnings.csv` to generate the CSV file
+Run `./show-gcc-warnings --csv=warnings.csv $GCC_DIR` to generate the CSV file
 containing all warnings not enabled by default or by one of the common warning
 options and the minimum version in which they appeared (note that 4.6.0 means
 that the warning was already present in gcc 4.6.0, not necessarily that it was

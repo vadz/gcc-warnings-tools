@@ -8,11 +8,15 @@ sub MAIN(
         Str :$read-from,            #= Read existing files instead of reparsing.
         Str :$only-version,         #= Process only the (comma-separated) version(s).
         Bool :$all,                 #= Show all warnings, not just not enabled by others.
-        Bool :$json,                #= Use JSON for output (default: CSV).
-        Bool :$cpp,                 #= Output C++ code fragment.
-        Bool :$markdown,            #= Output Markdown table.
+        Str :$csv,                  #= File for CSV output.
+        Str :$json,                 #= File for JSON output.
+        Str :$cpp,                  #= File for C++ code output.
+        Str :$markdown,             #= File for Markdown output.
     ) {
     die qq{Please provide an existing gcc checkout path.} unless $gcc-directory.IO.d;
+
+    die qq{Specify at least one output file.}
+	unless $csv or $json or $cpp or $markdown;
 
     # All gcc releases since 3.4.5 have Git release tags of this form. Older
     # releases are also tagged with gcc-x_y_z-release, but we don't care about
@@ -112,9 +116,14 @@ sub MAIN(
     if $json {
         # Dump results as JSON.
         use JSON::Fast;
-        put to-json %warnings, :sorted-keys
-    } elsif $cpp {
+
+	my $out = open :w, $json;
+
+        $out.put: to-json %warnings, :sorted-keys
+    }
+    if $cpp {
         # Dump results as C++ fragment.
+        my $out = open :w, $cpp;
         for %warnings.sort -> (:$key, :$value) {
             # We can't use trailing '=', as such warnings must be specified with
             # a value after '=', which we don't have here.
@@ -129,18 +138,20 @@ sub MAIN(
             # version with _Pragma support, which is required to implement
             # HANDLE_GCC_WARNING.
             if $version eq '4.6' {
-                put "HANDLE_GCC_WARNING($key)"
+                $out.put: "HANDLE_GCC_WARNING($key)"
             } else {
-                print qq:to/END/;
+                $out.print: qq:to/END/;
                     #if CHECK_GCC_VERSION({ S/\./,/ with $version })
                     HANDLE_GCC_WARNING($key)
                     #endif // $version
                     END
             }
         }
-    } elsif $markdown {
+    }
+    if $markdown {
         # Dump results as a Markdown table.
-        print qq:to/END/;
+        my $out = open :w, $markdown;
+        $out.print: qq:to/END/;
             | Warning | Version |{$all ?? ' Enabled by |' !! ''}
             |---------|:-------:|{$all ?? ':----------:|' !! ''}
             END
@@ -152,17 +163,19 @@ sub MAIN(
             if $all and my $enabled-by = %enabled-by{$key} {
                 $line ~= "|$enabled-by"
             }
-            put $line
+            $out.put: $line
         }
-    } else {
-        # By default dump results as CSV.
-        put 'Warning,Version' ~ ($all ?? ',Enabled by' !! '');
+    }
+    if $csv {
+        # Dump results as CSV.
+        my $out = open :w, $csv;
+        $out.put: 'Warning,Version' ~ ($all ?? ',Enabled by' !! '');
         for %warnings.sort -> (:$key, :$value) {
             my $line = "$key,$value";
             if $all and my $enabled-by = %enabled-by{$key} {
                 $line ~= ",$enabled-by"
             }
-            put $line
+            $out.put: $line
         }
     }
 }
