@@ -6,6 +6,6 @@ path to a checkout of gcc sources.
 
 - Dump the warnings for the new version: `make update GCC_VER=13.1.0`
 - Update all files: `make`
-- Update the tables online.
+- Update the tables in the wiki.
 - Update the version in `README.md`.
 - Commit/push.

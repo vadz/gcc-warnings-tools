@@ -13,9 +13,9 @@ warning options.
 You can see the results of running the script for gcc versions up to 12.1
 online:
 
-1. Here are the [warnings not enabled](https://hackmd.io/@VZ/gcc-warnings) by
-   another warning option.
-1. And here is the table with [all gcc warnings](https://hackmd.io/@VZ/all-gcc-warnings).
+1. Here are the [warnings not enabled](https://github.com/vadz/gcc-warnings-tools/wiki/gcc-warnings) by
+   default or by another warning option.
+1. And here is the table with [all gcc warnings](https://github.com/vadz/gcc-warnings-tools/wiki/all-gcc-warnings).
 
 
 Requirements
