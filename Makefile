@@ -3,7 +3,7 @@ $(error GCC_DIR must be set)
 endif
 
 .PHONY: all
-all: warnings.csv warnings.cpp warnings.json warnings.md
+all:
 	./show-gcc-warnings --read-from=gcc-all --all \
 	    --csv=warnings.csv \
 	    --json=warnings.json \
