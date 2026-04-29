@@ -16,7 +16,7 @@ sub MAIN(
     die qq{Please provide an existing gcc checkout path.} unless $gcc-directory.IO.d;
 
     die qq{Specify at least one output file.}
-        unless $csv or $json or $cpp or $markdown;
+        unless $dump-all-to or $csv or $json or $cpp or $markdown;
 
     # All gcc releases since 3.4.5 have Git release tags of this form. Older
     # releases are also tagged with gcc-x_y_z-release, but we don't care about
