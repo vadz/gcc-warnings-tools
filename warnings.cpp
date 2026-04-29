@@ -4,6 +4,9 @@ HANDLE_GCC_WARNING(abi-tag)
 #endif // 4.8
 HANDLE_GCC_WARNING(address)
 HANDLE_GCC_WARNING(aggregate-return)
+#if CHECK_GCC_VERSION(14,1)
+HANDLE_GCC_WARNING(alloc-size)
+#endif // 14.1
 #if CHECK_GCC_VERSION(7,1)
 HANDLE_GCC_WARNING(alloc-zero)
 #endif // 7.1
@@ -43,6 +46,9 @@ HANDLE_GCC_WARNING(conversion)
 HANDLE_GCC_WARNING(ctad-maybe-unsupported)
 #endif // 11.1
 HANDLE_GCC_WARNING(ctor-dtor-privacy)
+#if CHECK_GCC_VERSION(13,1)
+HANDLE_GCC_WARNING(dangling-reference)
+#endif // 13.1
 #if CHECK_GCC_VERSION(4,9)
 HANDLE_GCC_WARNING(date-time)
 #endif // 4.9
@@ -61,6 +67,12 @@ HANDLE_GCC_WARNING(deprecated-enum-enum-conversion)
 #if CHECK_GCC_VERSION(11,1)
 HANDLE_GCC_WARNING(deprecated-enum-float-conversion)
 #endif // 11.1
+#if CHECK_GCC_VERSION(15,1)
+HANDLE_GCC_WARNING(deprecated-literal-operator)
+#endif // 15.1
+#if CHECK_GCC_VERSION(15,1)
+HANDLE_GCC_WARNING(deprecated-variadic-comma-omission)
+#endif // 15.1
 HANDLE_GCC_WARNING(disabled-optimization)
 HANDLE_GCC_WARNING(double-promotion)
 #if CHECK_GCC_VERSION(7,1)
@@ -75,6 +87,9 @@ HANDLE_GCC_WARNING(enum-compare)
 #if CHECK_GCC_VERSION(8,1)
 HANDLE_GCC_WARNING(extra-semi)
 #endif // 8.1
+#if CHECK_GCC_VERSION(14,1)
+HANDLE_GCC_WARNING(flex-array-member-not-at-end)
+#endif // 14.1
 HANDLE_GCC_WARNING(float-equal)
 HANDLE_GCC_WARNING(format)
 HANDLE_GCC_WARNING(format-contains-nul)
@@ -96,6 +111,9 @@ HANDLE_GCC_WARNING(infinite-recursion)
 #endif // 12.1
 HANDLE_GCC_WARNING(init-self)
 HANDLE_GCC_WARNING(inline)
+#if CHECK_GCC_VERSION(13,1)
+HANDLE_GCC_WARNING(invalid-constexpr)
+#endif // 13.1
 #if CHECK_GCC_VERSION(11,1)
 HANDLE_GCC_WARNING(invalid-imported-macros)
 #endif // 11.1
@@ -138,6 +156,9 @@ HANDLE_GCC_WARNING(non-virtual-dtor)
 #if CHECK_GCC_VERSION(4,7)
 HANDLE_GCC_WARNING(nonnull)
 #endif // 4.7
+#if CHECK_GCC_VERSION(14,2)
+HANDLE_GCC_WARNING(nrvo)
+#endif // 14.2
 #if CHECK_GCC_VERSION(6,1)
 HANDLE_GCC_WARNING(null-dereference)
 #endif // 6.1
@@ -167,6 +188,9 @@ HANDLE_GCC_WARNING(reorder)
 HANDLE_GCC_WARNING(restrict)
 #endif // 7.1
 HANDLE_GCC_WARNING(return-type)
+#if CHECK_GCC_VERSION(13,1)
+HANDLE_GCC_WARNING(self-move)
+#endif // 13.1
 HANDLE_GCC_WARNING(sequence-point)
 HANDLE_GCC_WARNING(shadow)
 #if CHECK_GCC_VERSION(6,1)
@@ -177,6 +201,9 @@ HANDLE_GCC_WARNING(sign-conversion)
 HANDLE_GCC_WARNING(sign-promo)
 HANDLE_GCC_WARNING(stack-protector)
 HANDLE_GCC_WARNING(strict-aliasing)
+#if CHECK_GCC_VERSION(13,1)
+HANDLE_GCC_WARNING(strict-flex-arrays)
+#endif // 13.1
 HANDLE_GCC_WARNING(strict-null-sentinel)
 HANDLE_GCC_WARNING(strict-overflow)
 #if CHECK_GCC_VERSION(10,1)
@@ -211,6 +238,9 @@ HANDLE_GCC_WARNING(switch-default)
 HANDLE_GCC_WARNING(switch-enum)
 HANDLE_GCC_WARNING(synth)
 HANDLE_GCC_WARNING(system-headers)
+#if CHECK_GCC_VERSION(14,1)
+HANDLE_GCC_WARNING(template-id-cdtor)
+#endif // 14.1
 #if CHECK_GCC_VERSION(6,1)
 HANDLE_GCC_WARNING(templates)
 #endif // 6.1
