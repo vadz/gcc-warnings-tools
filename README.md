@@ -10,7 +10,7 @@ enabled by default, nor by using some other warning option, such as `-Wall`,
 to explicitly enable in the C++ projects already using all the usual "maximum"
 warning options.
 
-You can see the results of running the script for gcc versions up to 15.2
+You can see the results of running the script for gcc versions up to 16.1
 online:
 
 1. Here are the [warnings not enabled](https://github.com/vadz/gcc-warnings-tools/wiki/gcc-warnings) by

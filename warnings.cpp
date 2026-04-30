@@ -20,6 +20,9 @@ HANDLE_GCC_WARNING(array-bounds)
 #if CHECK_GCC_VERSION(12,1)
 HANDLE_GCC_WARNING(array-compare)
 #endif // 12.1
+#if CHECK_GCC_VERSION(16,1)
+HANDLE_GCC_WARNING(auto-profile)
+#endif // 16.1
 HANDLE_GCC_WARNING(builtin-macro-redefined)
 HANDLE_GCC_WARNING(cast-align)
 #if CHECK_GCC_VERSION(8,1)
@@ -118,6 +121,9 @@ HANDLE_GCC_WARNING(invalid-constexpr)
 HANDLE_GCC_WARNING(invalid-imported-macros)
 #endif // 11.1
 HANDLE_GCC_WARNING(invalid-pch)
+#if CHECK_GCC_VERSION(16,1)
+HANDLE_GCC_WARNING(keyword-macro)
+#endif // 16.1
 #if CHECK_GCC_VERSION(4,8)
 HANDLE_GCC_WARNING(literal-suffix)
 #endif // 4.8
